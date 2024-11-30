@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: signup-service
+  labels:
+    app: signup-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: signup-service
+  template:
+    metadata:
+      labels:
+        app: signup-service
+    spec:
+      containers:
+        - name: signup-service
+          image: shiveshc710/football-manager:signupmicroservice
+          ports:
+            - containerPort: 8080
+          env:
+            - name: POSTGRESDBURL
+              value: jdbc:postgresql://fm-postgres:5432/fm_database
+            - name: POSTGRESDBUSER
+              value: postgres
+            - name: POSTGRESDBPASSWORD
+              value: postgres

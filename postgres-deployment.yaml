@@ -1,0 +1,99 @@
+#apiVersion: apps/v1
+#kind: Deployment
+#metadata:
+#  name: fm-postgres
+#  labels:
+#    app: fm-postgres
+#spec:
+#  replicas: 1
+#  selector:
+#    matchLabels:
+#      app: fm-postgres
+#  template:
+#    metadata:
+#      labels:
+#        app: fm-postgres
+#    spec:
+#      initContainers:
+#        - name: init-db
+#          image: postgres:latest  # Use the official Postgres image for init container
+#          command:
+#            - "sh"
+#            - "-c"
+#            - |
+#              # Wait for PostgreSQL to be ready
+#              retries=0
+#              until pg_isready -h fm-postgres -U postgres; do
+#                echo "Waiting for PostgreSQL to be ready... Attempt $((retries++))";
+#                sleep 5;
+#                if [ $retries -ge 12 ]; then
+#                  echo "PostgreSQL not ready after 1 minute, failing init container!";
+#                  exit 1;
+#                fi
+#              done
+#              # Set the password for PostgreSQL
+#              export PGPASSWORD=postgres
+#              # Once PostgreSQL is ready, run the SQL dump
+#              psql -h fm-postgres -U postgres -d fm_database -f /init-data/dump.sql
+#          volumeMounts:
+#            - name: init-data
+#              mountPath: /init-data  # Mount the ConfigMap with the dump file
+#      containers:
+#        - name: fm-postgres
+#          image: shiveshc710/football-manager:postgres
+#          ports:
+#            - containerPort: 5432
+#          env:
+#            - name: POSTGRES_USER
+#              value: postgres
+#            - name: POSTGRES_PASSWORD
+#              value: postgres
+#            - name: POSTGRES_DB
+#              value: fm_database
+#          volumeMounts:
+#            - name: fm-postgres-storage
+#              mountPath: /var/lib/postgresql/data  # Ensure data is persistent
+#      volumes:
+#        - name: fm-postgres-storage
+#          persistentVolumeClaim:
+#            claimName: fm-postgres-pvc  # Ensure the data persists in the PVC
+#        - name: init-data
+#          configMap:
+#            name: dump-sql-config  # Reference the ConfigMap containing the SQL dump
+
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fm-postgres
+  labels:
+    app: fm-postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fm-postgres
+  template:
+    metadata:
+      labels:
+        app: fm-postgres
+    spec:
+      containers:
+        - name: fm-postgres
+          image: shiveshc710/football-manager:postgres
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_USER
+              value: postgres
+            - name: POSTGRES_PASSWORD
+              value: postgres
+            - name: POSTGRES_DB
+              value: fm_database
+          volumeMounts:
+            - name: fm-postgres-storage
+              mountPath: /var/lib/postgresql/data  # Ensure data is persistent
+      volumes:
+        - name: fm-postgres-storage
+          persistentVolumeClaim:
+            claimName: fm-postgres-pvc  # Ensure the data persists in the PVC

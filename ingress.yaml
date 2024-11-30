@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: microservices
+  labels:
+    name: microservices
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: fmprod.example.com
+      http:
+        paths:
+          - pathType: Prefix
+            path: /api/users
+            backend:
+              service:
+                name: signup-service
+                port:
+                  number: 8080
