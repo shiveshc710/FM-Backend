@@ -4,6 +4,9 @@ import lombok.*;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDate;
+import java.util.Date;
+
 @Getter
 @Setter
 @Entity
@@ -11,9 +14,8 @@ import jakarta.persistence.*;
 public class User {
 
     @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "userid")
-    private Long userId;
+    private Integer userId;
 
     @Column(name = "phone_number")
     private String phoneNumber;
@@ -21,7 +23,7 @@ public class User {
     @Column(name = "email_id")
     private String emailId;
     @Column(name = "date_of_birth")
-    private String dateOfBirth;
+    private LocalDate dateOfBirth;
     @Column(name = "password")
     private String password;
     @Column(name = "name")
